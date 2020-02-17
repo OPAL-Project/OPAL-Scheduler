@@ -1,0 +1,99 @@
+swagger: '2.0'
+info:
+  version: 0.0.1
+  title: OPAL-scheduler
+  license:
+    name: MIT
+    url: https://github.com/aoehmichen/opal-scheduler/blob/master/LICENSE
+  description:  OPAL Scheduler
+
+paths:
+  /status:
+    get:
+      description: Status report. Part of the standard API for all the OPAL components
+      responses:
+        200:
+          description: Status report is active, replies the current status
+          schema:
+            type: object
+            description: Status report
+            properties:
+              status:
+                type: string
+                description: MUST be one of EAE_SERVICE_STATUS_XXX
+
+  /specs:
+    get:
+      description: Detailed status report. Part of the standard API for OPAL components
+      responses:
+        200:
+            description: desc
+            schema:
+                $ref: '#/definitions/statusModel'
+
+definitions:
+    statusModel:
+        description: Model to represent a service status
+        properties:
+            type:
+                type: string
+                description: Type of the eae service
+            status:
+                type: string
+                description: Current status of the service. Defaults to 'eae_service_idle'
+            statusLock:
+                type: boolean
+                description: Lock used to prevent the service status update
+            lastUpdate:
+                type: string
+                format: dateTime
+                description: Timestamp of the last update of this model
+            port:
+                type: integer
+                description: TCP Port the service is listening on
+            ip:
+                type: string
+                description: IPv4 address of the machine
+            hostname:
+                type: string
+                description: Domain name associated with this machine
+            system:
+                type: object
+                description: Hardware speciciafations
+                properties:
+                    arch:
+                        type: string
+                        description: System architecture label
+                    type:
+                        type: string
+                        description: System type label
+                    platform:
+                        type: string
+                        description: Operating system name
+                    version:
+                        type: string
+                        description: Operation system version number
+            cpu:
+                type: object
+                description: Information about the cpu
+                properties:
+                    cores:
+                        type: array
+                        items:
+                            type: object
+                            description: A single core properties list
+                    loadavg:
+                        type: array
+                        description: The load average for the last 1, 5 and 15 minutes
+                        items:
+                            type: number
+            memory:
+                type: object
+                description: Information about the memory
+                properties:
+                    total:
+                        type: string
+                        description: Total memory on the system. Unit is provided in the value
+                    free:
+                        type: string
+                        description: Available memory on the system. Unit is provided in the value

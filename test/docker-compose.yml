@@ -1,0 +1,46 @@
+version: '3'
+services:
+    mongodb:
+        image: mongo:latest
+        environment:
+            - MONGO_DATA_DIR=/data/mongodb
+            - MONGO_LOG_DIR=/dev/null
+            - MONGODB_DBNAME=opal
+        command: mongod --logpath=/dev/null # --quiet
+        ports:
+            - 27017:27017
+
+    swift:
+        image: bouncestorage/swift-aio
+        ports:
+            - 8080:8080
+        logging:
+              driver: "none"
+
+    compute:
+        image: aoehmich/eae-compute:latest
+        depends_on:
+            - mongodb
+            - swift
+        links:
+            - mongodb
+            - swift
+        ports:
+            - 80:80
+        volumes:
+            - ./opal.compute.config.js:/usr/app/config/eae.compute.config.js
+
+    tests:
+        build:
+            context: ..
+            dockerfile: ./test/Dockerfile
+        depends_on:
+            - mongodb
+            - swift
+            - compute
+        links:
+            - mongodb
+            - swift
+            - compute
+        ports:
+            - 8000:8000
